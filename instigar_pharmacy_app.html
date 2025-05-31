@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instigar - Pharmacy Dispensing Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .brand-info h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .brand-info p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .programmer-info {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .quick-reference {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .drug-header {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .drug-info h2 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .drug-info .generic {
+            color: #e74c3c;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .drug-info .description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .dosage-card {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .dosage-card h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .dosage-card .dose {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.8rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dosing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dosing-card {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .dosing-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .dosing-card .dose-info {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            border-left: 5px solid #e74c3c;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .warning-box h4 {
+            color: #c0392b;
+            margin-bottom: 0.5rem;
+        }
+
+        .interactions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .interaction-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .interaction-item h5 {
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+        }
+
+        .side-effects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .side-effect-category {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            border-top: 4px solid #3498db;
+        }
+
+        .side-effect-category h5 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .side-effect-category ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .side-effect-category li {
+            padding: 0.2rem 0;
+            color: #666;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            padding: 0.8rem 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .drug-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: none;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">PH</div>
+                <div class="brand-info">
+                    <h1>Pharmacy Assistant</h1>
+                    <p>Professional Medication Dispensing Tool</p>
+                </div>
+            </div>
+            <div class="programmer-info">
+                <div>Programmed by <strong>PH.Mohamed Kamal Telis</strong></div>
+                <div style="margin-top: 0.3rem; font-size: 0.7rem;">
+                    © 2024 - All rights reserved. Unauthorized reproduction or distribution prohibited.
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="quick-reference">
+            <div class="drug-header">
+                <div class="drug-info">
+                    <h2>Instigar®</h2>
+                    <div class="generic">Dexlansoprazole 30mg Modified-Release Capsules</div>
+                    <div class="description">
+                        Proton Pump Inhibitor (PPI) for treatment of erosive reflux esophagitis, 
+                        maintenance of healed erosive reflux esophagitis, and symptomatic GERD.
+                    </div>
+                </div>
+                <div class="dosage-card">
+                    <h3>Standard Dose</h3>
+                    <div class="dose">30mg</div>
+                    <div>Once Daily</div>
+                </div>
+            </div>
+
+            <input type="text" class="search-box" id="searchBox" placeholder="Search medication information...">
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dosing')">Dosing Guide</button>
+            <button class="tab" onclick="showTab('warnings')">Warnings</button>
+            <button class="tab" onclick="showTab('interactions')">Interactions</button>
+            <button class="tab" onclick="showTab('sideeffects')">Side Effects</button>
+            <button class="tab" onclick="showTab('counseling')">Patient Counseling</button>
+            <button class="tab" onclick="showTab('storage')">Storage & Handling</button>
+        </div>
+
+        <div id="dosing" class="tab-content active">
+            <h3>Dosing Guidelines</h3>
+            <div class="dosing-grid">
+                <div class="dosing-card">
+                    <h4>Erosive Reflux Esophagitis - Treatment</h4>
+                    <div class="dose-info">60mg once daily</div>
+                    <div>Duration: 4 weeks (may extend to 8 weeks if not healed)</div>
+                    <div>Age: Adults & Adolescents 12-17 years</div>
+                </div>
+                <div class="dosing-card">
+                    <h4>Erosive Reflux Esophagitis - Maintenance</h4>
+                    <div class="dose-info">30mg once daily</div>
+                    <div>Duration: Up to 6 months (adults)</div>
+                    <div>Age: Adults & Adolescents 12-17 years</div>
+                </div>
+                <div class="dosing-card">
+                    <h4>Non-Erosive GERD</h4>
+                    <div class="dose-info">30mg once daily</div>
+                    <div>Duration: Up to 4 weeks</div>
+                    <div>Age: Adults & Adolescents 12-17 years</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <h4>Special Populations</h4>
+                <p><strong>Elderly:</strong> Max 60mg daily unless clinically indicated<br>
+                <strong>Moderate Hepatic Impairment:</strong> Max 30mg daily<br>
+                <strong>Severe Hepatic Impairment:</strong> Not recommended<br>
+                <strong>Renal Impairment:</strong> No adjustment needed<br>
+                <strong>Children < 12 years:</strong> Not recommended</p>
+            </div>
+        </div>
+
+        <div id="warnings" class="tab-content">
+            <h3>Warnings & Precautions</h3>
+            
+            <div class="warning-box">
+                <h4>⚠️ Black Box Warnings</h4>
+                <p>May mask symptoms of gastric malignancy - exclude malignant gastric tumor before use</p>
+            </div>
+
+            <div class="warning-box">
+                <h4>🔴 Contraindications</h4>
+                <p>Hypersensitivity to dexlansoprazole or any excipients</p>
+            </div>
+
+            <div class="dosing-grid">
+                <div class="dosing-card" style="background: linear-gradient(135deg, #ff7675, #fd79a8);">
+                    <h4>Long-term Use Risks</h4>
+                    <div>• Hypomagnesemia</div>
+                    <div>• Bone fractures (hip, wrist, spine)</div>
+                    <div>• Vitamin B12 deficiency</div>
+                    <div>• GI infections (C. diff)</div>
+                </div>
+                <div class="dosing-card" style="background: linear-gradient(135deg, #fdcb6e, #e17055);">
+                    <h4>Monitor For</h4>
+                    <div>• Severe cutaneous reactions</div>
+                    <div>• Subacute cutaneous lupus</div>
+                    <div>• Acute tubulointerstitial nephritis</div>
+                    <div>• Chromogranin A levels</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="interactions" class="tab-content">
+            <h3>Drug Interactions</h3>
+            
+            <div class="interactions-grid">
+                <div class="interaction-item">
+                    <h5>❌ Avoid Combination</h5>
+                    <p><strong>HIV Protease Inhibitors:</strong> Atazanavir, Nelfinavir - Significant reduction in bioavailability</p>
+                </div>
+                <div class="interaction-item">
+                    <h5>❌ Avoid Combination</h5>
+                    <p><strong>Antifungals:</strong> Ketoconazole, Itraconazole - May result in sub-therapeutic concentrations</p>
+                </div>
+                <div class="interaction-item">
+                    <h5>⚠️ Monitor Closely</h5>
+                    <p><strong>Digoxin:</strong> May increase plasma levels - monitor digoxin levels</p>
+                </div>
+                <div class="interaction-item">
+                    <h5>⚠️ Monitor Closely</h5>
+                    <p><strong>Warfarin:</strong> Monitor INR and PT, especially when starting/stopping</p>
+                </div>
+                <div class="interaction-item">
+                    <h5>⚠️ Monitor Closely</h5>
+                    <p><strong>Tacrolimus:</strong> May increase concentrations - monitor levels</p>
+                </div>
+                <div class="interaction-item">
+                    <h5>⚠️ Monitor Closely</h5>
+                    <p><strong>High-dose Methotrexate:</strong> May increase MTX levels - consider temporary withdrawal</p>
+                </div>
+                <div class="interaction-item">
+                    <h5>📝 Timing</h5>
+                    <p><strong>Antacids/Sucralfate:</strong> Take dexlansoprazole at least 1 hour after these medications</p>
+                </div>
+                <div class="interaction-item">
+                    <h5>✅ No Adjustment</h5>
+                    <p><strong>Clopidogrel:</strong> Slight reduction in active metabolite but no clinical significance</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="sideeffects" class="tab-content">
+            <h3>Adverse Drug Reactions</h3>
+            
+            <div class="side-effects-grid">
+                <div class="side-effect-category">
+                    <h5>Common (≥1/100)</h5>
+                    <ul>
+                        <li>• Diarrhea</li>
+                        <li>• Abdominal pain</li>
+                        <li>• Nausea</li>
+                        <li>• Abdominal discomfort</li>
+                        <li>• Flatulence</li>
+                        <li>• Constipation</li>
+                    </ul>
+                </div>
+                <div class="side-effect-category">
+                    <h5>Uncommon (≥1/1,000)</h5>
+                    <ul>
+                        <li>• Headache</li>
+                        <li>• Dizziness</li>
+                        <li>• Insomnia</li>
+                        <li>• Hypertension</li>
+                        <li>• Vomiting</li>
+                        <li>• Urticaria</li>
+                    </ul>
+                </div>
+                <div class="side-effect-category">
+                    <h5>Rare (≥1/10,000)</h5>
+                    <ul>
+                        <li>• Depression</li>
+                        <li>• Convulsion</li>
+                        <li>• Visual disturbance</li>
+                        <li>• Vertigo</li>
+                        <li>• Hip/wrist/spine fractures</li>
+                    </ul>
+                </div>
+                <div class="side-effect-category">
+                    <h5>Serious (Post-marketing)</h5>
+                    <ul>
+                        <li>• Stevens-Johnson syndrome</li>
+                        <li>• Toxic epidermal necrolysis</li>
+                        <li>• DRESS syndrome</li>
+                        <li>• Autoimmune hemolytic anemia</li>
+                        <li>• Tubulointerstitial nephritis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="counseling" class="tab-content">
+            <h3>Patient Counseling Points</h3>
+            
+            <div class="dosing-grid">
+                <div class="dosing-card" style="background: linear-gradient(135deg, #00b894, #00cec9);">
+                    <h4>📋 Administration</h4>
+                    <div>• Take once daily</div>
+                    <div>• Can take with or without food</div>
+                    <div>• Swallow capsules whole</div>
+                    <div>• Can open and mix with applesauce</div>
+                    <div>• Do NOT chew granules</div>
+                </div>
+                <div class="dosing-card" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
+                    <h4>⏰ Duration</h4>
+                    <div>• Complete full course</div>
+                    <div>• Don't stop early</div>
+                    <div>• Regular follow-up needed</div>
+                    <div>• Long-term use requires monitoring</div>
+                </div>
+                <div class="dosing-card" style="background: linear-gradient(135deg, #fd79a8, #fdcb6e);">
+                    <h4>🔔 When to Call Doctor</h4>
+                    <div>• Severe diarrhea</div>
+                    <div>• Skin rash</div>
+                    <div>• Unusual fatigue</div>
+                    <div>• Muscle cramps</div>
+                    <div>• Seizures or dizziness</div>
+                </div>
+                <div class="dosing-card" style="background: linear-gradient(135deg, #e17055, #fab1a0);">
+                    <h4>💊 Drug Interactions</h4>
+                    <div>• Tell all doctors about this medication</div>
+                    <div>• Inform about all other medications</div>
+                    <div>• Separate from antacids by 1 hour</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <h4>Important Reminders</h4>
+                <p>• Contains sucrose - inform diabetic patients<br>
+                • May affect lab tests (Chromogranin A)<br>
+                • Store below 30°C in original package<br>
+                • Not suitable for children under 12 years</p>
+            </div>
+        </div>
+
+        <div id="storage" class="tab-content">
+            <h3>Storage & Handling Information</h3>
+            
+            <div class="dosing-grid">
+                <div class="dosing-card" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">
+                    <h4>🌡️ Storage Conditions</h4>
+                    <div class="dose-info">Store below 30°C</div>
+                    <div>Keep in original package</div>
+                    <div>Protect from moisture</div>
+                    <div>Do not refrigerate</div>
+                </div>
+                <div class="dosing-card" style="background: linear-gradient(135deg, #00b894, #00cec9);">
+                    <h4>📦 Package Information</h4>
+                    <div class="dose-info">Aluminum-aluminum blisters</div>
+                    <div>Available: 14 & 28 capsules</div>
+                    <div>Blue cap, gray body</div>
+                    <div>Shelf life: 36 months</div>
+                </div>
+                <div class="dosing-card" style="background: linear-gradient(135deg, #fdcb6e, #e17055);">
+                    <h4>🗑️ Disposal</h4>
+                    <div>Follow local requirements</div>
+                    <div>Do not flush down toilet</div>
+                    <div>Return unused to pharmacy</div>
+                    <div>Keep away from children</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <h4>Manufacturer Information</h4>
+                <p><strong>Jazeera Pharmaceutical Industries</strong><br>
+                Al-Kharj Road, P.O. Box 106229<br>
+                Riyadh 11666, Saudi Arabia<br>
+                Tel: +(966-11) 8107023<br>
+                Email: SAPV@hikma.com</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div>
+            <h4>Professional Pharmacy Tool</h4>
+            <p>Developed to enhance medication safety and improve patient care</p>
+            <div class="copyright">
+                © 2024 PH.Mohamed Kamal Telis. All rights reserved.<br>
+                This software is protected by copyright law. Unauthorized reproduction, distribution, 
+                or modification is strictly prohibited and may result in legal action.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Search functionality
+        const searchBox = document.getElementById('searchBox');
+        searchBox.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const allContent = document.querySelectorAll('.tab-content');
+            
+            // Remove previous highlights
+            document.querySelectorAll('.highlight').forEach(el => {
+                const parent = el.parentNode;
+                parent.replaceChild(document.createTextNode(el.textContent), el);
+                parent.normalize();
+            });
+
+            if (searchTerm.length > 2) {
+                allContent.forEach(content => {
+                    const walker = document.createTreeWalker(
+                        content,
+                        NodeFilter.SHOW_TEXT,
+                        null,
+                        false
+                    );
+
+                    const textNodes = [];
+                    let node;
+                    while (node = walker.nextNode()) {
+                        textNodes.push(node);
+                    }
+
+                    textNodes.forEach(textNode => {
+                        const text = textNode.textContent;
+                        if (text.toLowerCase().includes(searchTerm)) {
+                            const regex = new RegExp(`(${searchTerm})`, 'gi');
+                            const highlightedText = text.replace(regex, '<span class="highlight">$1</span>');
+                            
+                            const wrapper = document.createElement('div');
+                            wrapper.innerHTML = highlightedText;
+                            
+                            while (wrapper.firstChild) {
+                                textNode.parentNode.insertBefore(wrapper.firstChild, textNode);
+                            }
+                            textNode.parentNode.removeChild(textNode);
+                        }
+                    });
+                });
+            }
+        });
+
+        // Add smooth scrolling and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.dosing-card, .interaction-item, .side-effect-category');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'fadeIn 0.6s ease forwards';
+                    }
+                });
+            });
+
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key >= '1' && e.key <= '6') {
+                e.preventDefault();
+                const tabIndex = parseInt(e.key) - 1;
+                const tabs = document.querySelectorAll('.tab');
+                if (tabs[tabIndex]) {
+                    tabs[tabIndex].click();
+                }
+            }
+            
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                searchBox.focus();
+            }
+        });
+    </script>
+</body>
+</html>
